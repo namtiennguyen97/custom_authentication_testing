@@ -10,30 +10,40 @@
 
 </head>
 <body>
-@if(\Illuminate\Support\Facades\Session::has('logged'))
-
-<div align="right" style="background-color: #196855">
-    @if($user->image == NULL)
-<img src="{{asset('001-fix.jpg')}}" width="50" style="height: 50px; width: 50px" class="img img-thumbnail" alt="Avatar">
-        @else
-        <img src="{{asset('storage/'.$user->image)}}" width="50" style="height: 50px; width: 50px" class="img img-thumbnail" alt="Avatar">
-        @endif
-</div>
-@endif
-
-<h1 align="center">User total data: <b>{{count(\App\Models\User::all())}}</b>
-    <button id="showUserData" class="btn btn-warning">Show <i class="fa fa-eye"></i></button>
+<div style="background-color: #8aafd7;height: 60px">
     @if(\Illuminate\Support\Facades\Session::has('logged'))
-        <a class="btn btn-success" href="{{route('user.profile')}}">{{$user->name}} DashBoard <i class="fa fa-user"></i></a>
-        <a><form method="post" action="{{route('user.logout')}}">
-                @csrf
-                <button type="submit" class="btn btn-danger">Logout  <i class="fa fa-sign-out-alt"></i></button>
-            </form></a>
+        <div>
+            <div class="dropdown">
+                @if($user->image == NULL)
+                    <img src="{{asset('001-fix.jpg')}}" width="50" style="height: 50px; width: 50px;position: absolute;top: 8px;right: 16px" class="img img-thumbnail dropdown-toggle" id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false" alt="Avatar">
+                @else
+                    <img src="{{asset('storage/'.$user->image)}}" width="50" style="height: 50px; width: 50px" class="img img-thumbnail  dropdown-toggle" id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false" alt="Avatar">
+                @endif
+                <ul class="dropdown-menu" aria-labelledby="avatarDropdown">
+                    <li><a class="dropdown-item" href="{{route('user.profile')}}"><span class="btn btn-success">{{$user->name}} DashBoard <i class="fa fa-user"></i></span></a></li>
+                    <li><a class="dropdown-item" href="#"><form method="post" action="{{route('user.logout')}}">
+                                @csrf
+                                <button type="submit" class="btn btn-danger form-control">Logout  <i class="fa fa-sign-out-alt"></i></button>
+                            </form></a></li>
+                    {{--                <li><a class="dropdown-item" href="#">Something else here</a></li>--}}
+                </ul>
+            </div>
+
+        </div>
+    @endif
+
+    <h1 align="center">User total data: <b>{{count(\App\Models\User::all())}}</b>
+        <button id="showUserData" class="btn btn-warning">Show <i class="fa fa-eye"></i></button>
+        @if(\Illuminate\Support\Facades\Session::has('logged'))
+            {{--        <span class="text-success valid">You has been logged!</span>--}}
         @else
-    <button id="loginButton" class="btn btn-success">Login <i class="fas fa-sign-in-alt"></i></button>
-    <button id="registerButton" class="btn btn-info">Register <i class="fas fa-user-plus"></i></button>
+            <button id="loginButton" class="btn btn-success">Login <i class="fas fa-sign-in-alt"></i></button>
+            <button id="registerButton" class="btn btn-info">Register <i class="fas fa-user-plus"></i></button>
         @endif
-</h1>
+    </h1>
+</div>
+
+
 
 
 <!-- Modal login -->
