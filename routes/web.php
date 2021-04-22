@@ -19,5 +19,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/',[\App\Http\Controllers\UserController::class,'index'])->name('index');
 Route::post('/register',[\App\Http\Controllers\UserController::class,'register'])->name('user.register');
 Route::post('/check',[\App\Http\Controllers\UserController::class,'check'])->name('user.check');
-Route::get('/profile',[\App\Http\Controllers\UserController::class,'userProfile'])->name('user.profile')->middleware('loggedCheck');
+Route::get('/profile',[\App\Http\Controllers\UserController::class,'userProfile'])->name('user.profile')->middleware('authorize');
 Route::post('/logout',[\App\Http\Controllers\UserController::class,'logout'])->name('user.logout');
+
+//test auth
+Route::get('/guest', function (){
+   return view('authTest.guest');
+})->name('guest')->middleware('authorize');
+
+Route::get('/admin', function (){
+    return view('authTest.admin');
+})->name('admin')->middleware('authorizeAdmin');

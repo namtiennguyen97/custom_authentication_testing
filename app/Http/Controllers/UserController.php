@@ -24,6 +24,7 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        $user->role_id = $request->role_id;
         $user->save();
         return response()->json(['Message:','User has been created!'],200);
     }

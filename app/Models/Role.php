@@ -12,4 +12,8 @@ class Role extends Model
     public $fillable = [
         'name'
     ];
+
+    public function users(){
+        return $this->hasMany(User::class);
+    }
 }

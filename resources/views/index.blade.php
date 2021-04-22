@@ -159,6 +159,14 @@
                             <td><span class="text-danger emailRegister"></span></td>
                         </tr>
                         <tr>
+                            <td>Role:</td>
+                            <td><select name="role_id">
+                                    @foreach(\App\Models\Role::all() as $value)
+                                        <option value="{{$value->id}}">{{$value->name}}</option>
+                                        @endforeach
+                                </select></td>
+                        </tr>
+                        <tr>
                             <td>Password:</td>
                             <td><input type="password" class="form-control" name="password" id="passwordRegister" placeholder="Enter Your Password" ></td>
                         </tr>

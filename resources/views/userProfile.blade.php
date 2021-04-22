@@ -102,9 +102,43 @@
             </div>
 
         </div>
+
+        @if($user->role_id == 1 || $user->role_id == 2)
         <div class="col border border-primary" style="background-image: url({{asset('bbb.gif')}})">
             <h5></h5>
         </div>
+        @else
+            <div class="col border border-primary">
+                <h5 align="center">User Data: </h5>
+                <table class="table table-dark tale-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach(\App\Models\User::all() as $value)
+                        <tr>
+                            <td>{{$value->id}}</td>
+                            <td>{{$value->name}}</td>
+                            <td>{{$value->email}}</td>
+                            <td>{{$value->roles->name}}</td>
+                            @if($value->id == $user->id)
+                                <td><a>You <i class="fa fa-star"></i></a></td>
+                                @else
+                                <td><a class="btn btn-danger" data-id="{{$value->id}}"><i class="fa fa-trash"></i></a></td>
+                            @endif
+                        </tr>
+                        @endforeach
+                    </tbody>
+
+                </table>
+            </div>
+        @endif
     </div>
 </div>
 
