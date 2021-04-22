@@ -18,7 +18,7 @@ class UserController extends Controller
             'name' => 'required|max:40',
             'email' => 'required|unique:users',
             'password' => 'required|max:20',
-            'renamePassword' => 'required|same:password'
+            'reEnterPassword' => 'required|same:password'
         ]);
         $user  = new User();
         $user->name = $request->name;
@@ -38,10 +38,11 @@ class UserController extends Controller
         if ($user){
             if (Hash::check($request->password,$user->password)){
                 $request->session()->put('logged',$user->id);
-                return redirect()->route('index');
+//                return redirect()->route('index');
+                return response()->json(['Success','You has been logged'],200);
             }
             else{
-                return redirect()->route('index');
+                return response()->json(['Error','Account not found!'],409);
             }
         }else{
             return response()->json(['message' => 'No user match!'],401);
@@ -63,4 +64,6 @@ class UserController extends Controller
             return redirect()->route('index');
         }
     }
+    // user dashboard
+
 }

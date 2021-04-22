@@ -6,11 +6,12 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>User Data</title>
+
     @include('cdn')
 
 </head>
 <body>
-<div style="background-color: #8aafd7;height: 60px">
+<div style="background-color: #8aafd7;height: 60px;background-image: url({{asset('eren.jpg')}})">
     @if(\Illuminate\Support\Facades\Session::has('logged'))
         <div>
             <div class="dropdown">
@@ -42,9 +43,48 @@
         @endif
     </h1>
 </div>
+<form>
+    <div class="container">
+        <div class="row">
+            <div>
+                <input type="text" class="form-control" placeholder="Searching...">
+            </div>
+            <div>
+                <button class="btn btn-primary" type="submit">Search <i class="fa fa-search"></i></button>
+            </div>
+        </div>
+    </div>
 
-
-
+</form>
+{{--showdata--}}
+<table class="table table-dark">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Image</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody id="showData">
+    @foreach(\App\Models\User::all() as $users)
+        <tr>
+            <td>{{$users->name}}</td>
+            <td>{{$users->email}}</td>
+            @if($users->image == NULL)
+                <td><img src="{{asset('001-fix.jpg')}}" width="50" style="width: 50px;height: 50px" class="img img-thumbnail"></td>
+                @else
+                <td><img src="{{asset('storage/'.$users->image)}}" width="50" style="width: 50px;height: 50px" class="img img-thumbnail"></td>
+                @endif
+            @if(\Illuminate\Support\Facades\Session::has('logged'))
+            @if($users->id === $user->id)
+                <td>You <i class="fa fa-star"></i></td>
+                @endif
+                @endif
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
 <!-- Modal login -->
 <div class="modal fade" id="modalLogin" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -62,13 +102,19 @@
                 <table class="table">
                     <tr>
                         <td>Email:</td>
-                        <td><input type="text" class="form-control" name="email"></td>
+                        <td><input type="text" class="form-control" name="email" id="emailLogin"></td>
                     </tr>
                     <tr>
                         <td>Password:</td>
-                        <td><input type="password" class="form-control" name="password" ></td>
+                        <td><input type="password" class="form-control" name="password"  id="passwordLogin"></td>
                     </tr>
+
                 </table>
+                <span class="text-danger emailLogin"></span>
+                <br>
+                <span class="text-danger passwordLogin"></span>
+                <br>
+                <span class="text-danger loginFail" ></span>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-success form-control">Login</button>
@@ -100,23 +146,31 @@
                     <table class="table">
                         <tr>
                             <td>Name:</td>
-                            <td><input type="text" class="form-control" name="name" placeholder="Enter Your Name..." value="{{old('name')}}"></td>
-                            <span class="text-danger">@error('name'){{$message}}@enderror</span>
+                            <td><input type="text" class="form-control" name="name" id="nameRegister" placeholder="Enter Your Name..." ></td>
+                        </tr>
+                        <tr>
+                            <td><span class="text-danger nameRegister"></span></td>
                         </tr>
                         <tr>
                             <td>Email:</td>
-                            <td><input type="text" class="form-control" name="email" placeholder="Enter Your Email..." value="{{old('email')}}"></td>
-                            <span class="text-danger">@error('email'){{$message}}@enderror</span>
+                            <td><input type="text" class="form-control" name="email" id="emailRegister" placeholder="Enter Your Email..." ></td>
+                        </tr>
+                        <tr>
+                            <td><span class="text-danger emailRegister"></span></td>
                         </tr>
                         <tr>
                             <td>Password:</td>
-                            <td><input type="password" class="form-control" name="password" placeholder="Enter Your Password" value="{{old('password')}}"></td>
-                            <span class="text-danger">@error('password'){{$message}}@enderror</span>
+                            <td><input type="password" class="form-control" name="password" id="passwordRegister" placeholder="Enter Your Password" ></td>
                         </tr>
                         <tr>
-                            <td>Password:</td>
-                            <td><input type="password" name="renamePassword" class="form-control" placeholder="Re-enter Your Password" value="{{old('renamePassword')}}"></td>
-                            <span class="text-danger">@error('renamePassword'){{$message}}@enderror</span>
+                            <td><span class="text-danger passwordRegister"></span></td>
+                        </tr>
+                        <tr>
+                            <td>Re-enter Password:</td>
+                            <td><input type="password" name="reEnterPassword" class="form-control" id="rePasswordRegister" placeholder="Re-enter Your Password"></td>
+                        </tr>
+                        <tr>
+                           <td><span class="text-danger rePasswordRegister"></span></td>
                         </tr>
                     </table>
                 </div>
@@ -132,10 +186,16 @@
 </div>
 
 
+
 <script>
+
     $('#loginButton').click(function () {
         $('#modalLogin').modal('show');
+
     });
+
+
+
     $('#showUserData').click(function () {
         $('#showUserData').text('Refresh');
         $(this).attr('id','refreshButton');
@@ -158,31 +218,100 @@
             data: $('#registerForm').serialize(),
             success: function (data) {
                 console.log(data);
+                toastr.success('Register successfully! Return to Login!');
                 $('#modalRegister').modal('hide');
                 $('#modalLogin').modal('show');
             },
             error: function (response) {
-                console.log(response.responseJSON);
-                console.log(response.responseText);
+                console.log(response.responseJSON.errors.name);
+                if (response.responseJSON.errors.name){
+                    $('#nameRegister').removeClass('is-valid');
+                    $('#nameRegister').addClass('is-invalid');
+                    $('.nameRegister').text(response.responseJSON.errors.name);
+                }
+                else {
+                    $('#nameRegister').removeClass('is-invalid');
+                    $('#nameRegister').addClass('is-valid');
+                }
+                //validate truong email
+                if (response.responseJSON.errors.email){
+                    $('#emailRegister').removeClass('is-valid');
+                    $('#emailRegister').addClass('is-invalid');
+                    $('.emailRegister').text(response.responseJSON.errors.email);
+                }
+                else {
+                    $('#emailRegister').removeClass('is-invalid');
+                    $('#emailRegister').addClass('is-valid');
+                }
+                //validate truong repassword
+                if (response.responseJSON.errors.reEnterPassword){
+                    $('#rePasswordRegister').removeClass('is-valid');
+                    $('#rePasswordRegister').addClass('is-invalid');
+                    $('.rePasswordRegister').text(response.responseJSON.errors.reEnterPassword);
+                }
+                else {
+                    $('#rePasswordRegister').removeClass('is-invalid');
+                    $('#rePasswordRegister').addClass('is-valid');
+                }
+
+                //validate truong password
+
+
+                if (response.responseJSON.errors.password){
+                    $('#passwordRegister').removeClass('is-valid');
+                    $('#passwordRegister').addClass('is-invalid');
+                    $('.passwordRegister').text(response.responseJSON.errors.password);
+                }
+                else {
+                    $('#passwordRegister').removeClass('is-invalid');
+                    $('#passwordRegister').addClass('is-valid');
+                }
+
+
             }
         });
     });
 
 
-    {{--$('#loginForm').on('submit', function (e) {--}}
-    {{--    e.preventDefault();--}}
-    {{--    $.ajax({--}}
-    {{--        url: "{{route('user.check')}}",--}}
-    {{--        method: 'post',--}}
-    {{--        data: $('#loginForm').serialize(),--}}
-    {{--        success: function (data) {--}}
-    {{--            console.log('ok');--}}
-    {{--        },--}}
-    {{--        error: function (response) {--}}
-    {{--            console.log(response);--}}
-    {{--        }--}}
-    {{--    });--}}
-    {{--})--}}
+    $('#loginForm').on('submit', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{route('user.check')}}",
+            method: 'post',
+            dataType: 'JSON',
+            data: $('#loginForm').serialize(),
+            success: function (data) {
+              console.log('LOGIN SUCCESSFULL');
+              toastr.success('Login successfully!');
+              window.location.reload();
+            },
+            error: function (response) {
+                console.log(response.responseJSON.message);
+                // $('.loginFail').text(response.responseJSON.message);
+                toastr.error("Your username or password is invalid! Please check again...");
+                //validate email
+                if (response.responseJSON.errors.email){
+                    $('#emailLogin').removeClass('is-valid');
+                    $('#emailLogin').addClass('is-invalid');
+                    $('.emailLogin').text(response.responseJSON.errors.email);
+                }else{
+                    $('#emailLogin').removeClass('is-invalid');
+                    $('#emailLogin').addClass('is-valid');
+                }
+                //validate password login
+                if (response.responseJSON.errors.password){
+                    $('#passwordLogin').removeClass('is-valid');
+                    $('#passwordLogin').addClass('is-invalid');
+                    $('.passwordLogin').text(response.responseJSON.errors.password);
+                }else{
+                    $('#passwordLogin').removeClass('is-invalid');
+                    $('#passwordLogin').addClass('is-valid');
+                }
+            }
+        });
+    })
+
+
 </script>
 </body>
 </html>
